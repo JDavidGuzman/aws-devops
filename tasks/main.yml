@@ -1,20 +1,31 @@
-- name: Playbook to invalidate cache from a cloudfront cdn 
+- name: Playbook to install prometheus node exporter
   hosts: localhost
   tasks:
 
+  - name: Debug
+    debug:
+      var: ansible_facts
+
+  - name: gather user 
+    shell: whoami
+    register: user 
+
+  - debug:
+      var: user
+
   - name: Create Downloads directory
     file:
-      path: '/home/{{ ansible_user }}/Downloads'
+      path: '/home/{{ ansible_env.USER }}/Downloads'
       state: directory
   - name: Download Prometheus Node Exporter
     get_url:
       url: https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz
-      dest: '/home/{{ ansible_user }}/Downloads'
+      dest: '/home/{{ ansible_env.USER }}/Downloads'
       checksum: sha256:8c1f6a317457a658e0ae68ad710f6b4098db2cad10204649b51e3c043aa3e70d
   - name: Extract Node Exporter
     unarchive:
-      src: '/home/{{ ansible_user }}/Downloads/node_exporter-1.1.2.linux-amd64.tar.gz'
-      dest: '/home/{{ ansible_user }}'
+      src: '/home/{{ ansible_env.USER }}/Downloads/node_exporter-1.1.2.linux-amd64.tar.gz'
+      dest: '/home/{{ ansible_env.USER }}'
       remote_src: yes
   - name: Create node_exporter user 
     user:
@@ -24,7 +35,7 @@
     become: yes
   - name: Copy node exporter to /usr/local/bin 
     copy:
-      src: '/home/{{ ansible_user }}/node_exporter-1.1.2.linux-amd64/node_exporter'
+      src: '/home/{{ ansible_env.USER }}/node_exporter-1.1.2.linux-amd64/node_exporter'
       dest: /usr/local/bin
       owner: node_exporter
       group: node_exporter
