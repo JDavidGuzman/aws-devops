@@ -31,11 +31,10 @@
       mode: '0700'
       remote_src: yes
     become: yes
-  - name: Copy Node Exporter service configuration
-    copy:
-      src: files/node_exporter.service
-      dest: /etc/systemd/system/node_exporter.service 
-    become: yes
+  - name: Download Node Exporter service configuration
+    get_url:
+      url: https://github.com/JDavidGuzman/ansible-prometheus-node-exporter/raw/master/files/node_exporter.service
+      dest: /etc/systemd/system/node_exporter.service
   - name: Start Node Exporter service 
     systemd:
       daemon_reload: yes
@@ -43,4 +42,3 @@
       enabled: yes
       name: node_exporter
     become: yes
- 
